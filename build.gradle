@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version "2.1.0"
 }
 
 group = 'org.example'
@@ -10,8 +10,18 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "17" // Java 17을 타겟으로 설정
+        javaParameters = true
+        freeCompilerArgs += ["-Xjvm-default=all"]
+    }
 }
 
 test {
