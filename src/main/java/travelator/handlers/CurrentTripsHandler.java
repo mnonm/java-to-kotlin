@@ -1,6 +1,7 @@
 package travelator.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import travelator.ITrackTrips;
 import travelator.http.Request;
 import travelator.http.Response;
@@ -22,7 +23,7 @@ public class CurrentTripsHandler {
                 .findFirst();
             if (customerId.isEmpty())
                 return new Response(HTTP_BAD_REQUEST);
-            var currentTrip = tracking.currentTripFor(customerId.get());
+            var currentTrip = tracking.currentTripFor(customerId.get(), Instant.now());
             return currentTrip.isPresent() ?
                 new Response(HTTP_OK,
                     objectMapper.writeValueAsString(currentTrip)) :
