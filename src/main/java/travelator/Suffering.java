@@ -1,6 +1,7 @@
 package travelator;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static travelator.Collections.sorted;
@@ -29,13 +30,13 @@ public class Suffering {
     }
 
     public static List<List<Journey>> routesToShowFor(String itineraryId) {
-        var routes = routesFor(itineraryId);
-        removeUnbearableRoutes(routes);
-        return routes;
+        return bearable(routesFor(itineraryId));
     }
 
-    private static void removeUnbearableRoutes(List<List<Journey>> routes) {
-        routes.removeIf(route -> sufferScoreFor(route) > 10);
+    private static List<List<Journey>> bearable(List<List<Journey>> routes) {
+       return routes.stream()
+           .filter(route -> sufferScoreFor(route) <= 10)
+           .collect(Collectors.toUnmodifiableList());
     }
 
     private static int sufferScore(
