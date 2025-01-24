@@ -1,43 +1,28 @@
 package travelator
 
+import travelator.Other.SOME_COMPLICATED_RESULT
 import java.util.stream.Collectors
-import kotlin.math.min
 
 object Suffering {
     @JvmStatic
-    fun sufferScoreFor(route: List<Journey>): Int {
-        return sufferScore(
-            longestJourneysIn(route, 3),
-            Routes.getDepartsFrom(route)
-        )
-    }
+    fun sufferScoreFor(route: List<Journey>): Int =
+    sufferScore(
+        route.longestJourneys(limit = 3),
+        Routes.getDepartsFrom(route)
+    )
 
     @JvmStatic
-    fun longestJourneysIn(
-        journeys: List<Journey>,
-        limit: Int
-    ): List<Journey> {
-        val actualLimit = Math.min(journeys.size, limit)
-        return Collections.sorted(
-            journeys,
-            Comparator.comparing { obj: Journey -> obj.duration }.reversed()
-        ).subList(0, actualLimit)
-    }
+    fun List<Journey>.longestJourneys(limit: Int): List<Journey> =
+        sortedByDescending { it.duration }.take(limit)
 
-    fun routesToShowFor(itineraryId: String?): List<List<Journey>> {
-        return bearable(Other.routesFor(itineraryId))
-    }
+    fun routesToShowFor(itineraryId: String?): List<List<Journey>> =
+        bearable(Other.routesFor(itineraryId))
 
-    private fun bearable(routes: List<List<Journey>>): List<List<Journey>> {
-        return routes.stream()
-            .filter { route -> sufferScoreFor(route) <= 10 }
-            .collect(Collectors.toUnmodifiableList())
-    }
+    private fun bearable(routes: List<List<Journey>>): List<List<Journey>> =
+        routes.filter { sufferScoreFor(it) <= 10 }
 
     private fun sufferScore(
         longestJourneys: List<Journey>,
         start: Location
-    ): Int {
-        return Other.SOME_COMPLICATED_RESULT()
-    }
+    ): Int = SOME_COMPLICATED_RESULT()
 }
