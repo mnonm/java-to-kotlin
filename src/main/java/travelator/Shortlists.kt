@@ -1,34 +1,23 @@
 @file:JvmName("Shortlists")
 package travelator
 
-import java.util.stream.Collectors
-import java.util.stream.Stream
+import java.util.Comparator.comparing
+import java.util.Comparator.comparingDouble
 
-fun <T> sorted(shortlist: List<T>, ordering: Comparator<in T>?): List<T> {
-    return shortlist.stream()
-        .sorted(ordering)
-        .collect(Collectors.toUnmodifiableList<T>())
-}
+fun <T> Iterable<T>.sorted(ordering: Comparator<in T>): List<T> =
+    sortedWith(ordering)
 
-fun <T> removeItemAt(shortlist: List<T>, index: Int): List<T> {
-    return Stream.concat<T>(
-        shortlist.stream().limit(index.toLong()),
-        shortlist.stream().skip((index + 1).toLong())
-    ).collect(Collectors.toUnmodifiableList<T>())
-}
+fun <T> Iterable<T>.withoutItemAt(index: Int): List<T> =
+    take(index) + drop(index + 1)
 
-fun byRating(): Comparator<HasRating> {
-    return Comparator.comparingDouble(HasRating::rating).reversed()
-}
+fun byRating(): Comparator<HasRating> =
+    comparingDouble(HasRating::rating).reversed()
 
-fun byPriceLowToHigh(): Comparator<HasPrice> {
-    return Comparator.comparing(HasPrice::price)
-}
+fun byPriceLowToHigh(): Comparator<HasPrice> =
+    comparing(HasPrice::price)
 
-fun <T> byValue(): Comparator<T> where T : HasPrice?, T : HasRating? {
-    return Comparator.comparingDouble { t: T -> t!!.rating / t.price }.reversed()
-}
+fun <T> byValue(): Comparator<T> where T : HasPrice?, T : HasRating? =
+    comparingDouble { t: T -> t!!.rating / t.price }.reversed()
 
-fun byRelevance(): Comparator<HasRelevance> {
-    return Comparator.comparingDouble(HasRelevance::relevance).reversed()
-}
+fun byRelevance(): Comparator<HasRelevance> =
+    Comparator.comparingDouble(HasRelevance::relevance).reversed()
