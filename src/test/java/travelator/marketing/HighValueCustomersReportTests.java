@@ -45,7 +45,7 @@ class HighValueCustomersReportTests {
     public void emptySpendIs0() {
         assertEquals(
             new CustomerData("1", "Fred", "Flintstone", 0, 0D),
-            HighValueCustomersReport.customerDataFrom("1\tFred\tFlintstone\t0")
+            HighValueCustomersReport.toCustomerData("1\tFred\tFlintstone\t0")
         );
     }
 

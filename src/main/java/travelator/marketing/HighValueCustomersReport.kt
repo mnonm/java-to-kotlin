@@ -1,60 +1,57 @@
 package travelator.marketing
 
-import java.io.BufferedReader
 import java.io.IOException
 import java.io.Reader
 import java.io.Writer
 import java.util.*
-import java.util.stream.Collectors
 
 object HighValueCustomersReport {
     @JvmStatic
     @Throws(IOException::class)
     fun generate(reader: Reader, writer: Writer) {
-        val valuableCustomers = BufferedReader(reader).lines()
-            .skip(1) // header
-            .map { line: String -> customerDataFrom(line) }
-            .filter { customerData: CustomerData -> customerData.score >= 10 }
-            .sorted(Comparator.comparing { customerData: CustomerData -> customerData.score })
-            .collect(Collectors.toList())
+        val valuableCustomers = reader
+            .readLines()
+            .toValuableCustomers()
+            .sortedBy(CustomerData::score)
 
-        writer.append("ID\tName\tSpend\n")
+        writer.appendLine("ID\tName\tSpend")
         for (customerData in valuableCustomers) {
-            writer.append(lineFor(customerData)).append("\n")
+            writer.appendLine(customerData.outputLine)
         }
-        writer.append(summaryFor(valuableCustomers))
+        writer.append(valuableCustomers.summarised())
     }
 
-    private fun summaryFor(valuableCustomers: List<CustomerData>): String {
-        val total = valuableCustomers.stream()
-            .mapToDouble { customerData: CustomerData -> customerData.spend }
-            .sum()
-        return "\tTOTAL\t" + formatMoney(total)
-    }
+    private fun List<String>.toValuableCustomers() = withoutHeader()
+        .map { line -> line.toCustomerData() }
+        .filter { it.score >= 10 }
+
+    private fun List<String>.withoutHeader() = drop(1)
+
+    private fun List<CustomerData>.summarised(): String =
+        sumOf { it.spend }.let { total ->
+            "\tTOTAL\t${total.toMoneyString()}"
+        }
 
     @JvmStatic
-    fun customerDataFrom(line: String): CustomerData {
-        val parts = line.split("\t".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        val spend = if (parts.size == 4) 0.0 else parts[4].toDouble()
-        return CustomerData(
-            parts[0],
-            parts[1],
-            parts[2],
-            parts[3].toInt(),
-            spend
-        )
-    }
+    internal fun String.toCustomerData(): CustomerData =
+        split("\t".toRegex()).dropLastWhile { it.isEmpty() }.let { parts ->
+            CustomerData(
+                id = parts[0],
+                givenName = parts[1],
+                familyName = parts[2],
+                score = parts[3].toInt(),
+                spend = if (parts.size == 4) 0.0 else parts[4].toDouble()
+            )
+        }
 
-    private fun lineFor(customer: CustomerData): String {
-        return customer.id + "\t" + marketingNameFor(customer) + "\t" +
-                formatMoney(customer.spend)
-    }
 
-    private fun formatMoney(money: Double): String {
-        return String.format("%#.2f", money)
-    }
+    private val CustomerData.outputLine: String
+        get() = "$id\t$marketingName\t${spend.toMoneyString()}"
 
-    private fun marketingNameFor(customer: CustomerData): String {
-        return customer.familyName.uppercase(Locale.getDefault()) + ", " + customer.givenName
-    }
+    private fun Double.toMoneyString() = this.formattedAs("%#.2f")
+
+    private fun Any?.formattedAs(format: String) = String.format(format, this)
+
+    private val CustomerData.marketingName: String
+        get() = familyName.uppercase(Locale.getDefault()) + ", " + givenName
 }
