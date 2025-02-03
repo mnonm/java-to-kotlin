@@ -24,19 +24,26 @@ private constructor(// <2>
         return amount.toString() + " " + currency.currencyCode
     }
 
-    fun add(that: Money): Money { // <5>
-        require(this.currency == that.currency) { "cannot add Money values of different currencies" }
+    fun add(that: Money): Money = this + that
 
-        return Money(amount.add(that.amount), this.currency)
+    operator fun plus(that: Money): Money { // <5>
+        require(this.currency == that.currency) {
+            "cannot add Money values of different currencies"
+        }
+
+        return Money(this.amount + that.amount, this.currency)
     }
 
     companion object {
-        fun of(amount: BigDecimal, currency: Currency): Money { // <1>
-            return Money(
+        @JvmStatic
+        fun of(amount: BigDecimal, currency: Currency): Money =
+            this(amount, currency)
+
+        operator fun invoke(amount: BigDecimal, currency: Currency): Money =
+            Money(
                 amount.setScale(currency.defaultFractionDigits),
                 currency
             )
-        }
 
 
         fun of(amountStr: String, currency: Currency): Money { // <2>
