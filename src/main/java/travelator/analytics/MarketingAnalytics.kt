@@ -1,40 +1,30 @@
-package travelator.analytics;
+package travelator.analytics
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.stream.Collectors
 
-import static java.util.stream.Collectors.groupingBy;
-
-public class MarketingAnalytics {
-    private final EventStore eventStore;
-
-    public MarketingAnalytics(
-        EventStore eventStore
-    ) {
-        this.eventStore = eventStore;
-    }
-
-    public double averageNumberOfEventsPerCompletedBooking(
-        String timeRange
-    ) {
-        Stream<Map<String, Object>> eventsForSuccessfulBookings =
+class MarketingAnalytics(
+    private val eventStore: EventStore
+) {
+    fun averageNumberOfEventsPerCompletedBooking(
+        timeRange: String
+    ): Double {
+        val eventsForSuccessfulBookings =
             eventStore
-                .queryAsStream("type=CompletedBooking&timerange=" + timeRange)
-                .flatMap(event -> {
-                    String interactionId = (String) event.get("interactionId");
-                    return eventStore.queryAsStream("interactionId=" + interactionId);
-                });
-        Map<String, List<Map<String, Object>>> bookingEventsByInteractionId =
-            eventsForSuccessfulBookings.collect(groupingBy(
-                event -> (String) event.get("interactionId"))
-            );
-        var averageNumberOfEventsPerCompletedBooking =
+                .queryAsStream("type=CompletedBooking&timerange=$timeRange")
+                .flatMap { event ->
+                    val interactionId = event["interactionId"] as String
+                    eventStore.queryAsStream("interactionId=$interactionId")
+                }
+        val bookingEventsByInteractionId =
+            eventsForSuccessfulBookings.collect(
+                Collectors.groupingBy { event -> event["interactionId"] as String }
+            )
+        val averageNumberOfEventsPerCompletedBooking =
             bookingEventsByInteractionId
-                .values()
+                .values
                 .stream()
-                .mapToInt(List::size)
-                .average();
-        return averageNumberOfEventsPerCompletedBooking.orElse(Double.NaN);
+                .mapToInt { it.size }
+                .average()
+        return averageNumberOfEventsPerCompletedBooking.orElse(Double.NaN)
     }
 }
