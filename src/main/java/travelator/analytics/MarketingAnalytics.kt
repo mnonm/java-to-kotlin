@@ -22,10 +22,10 @@ class MarketingAnalytics(
             eventStore
                 .queryAsSequence("interactionId=$interactionId")
         }
-
-    inline fun <T> Collection<T>.averageBy(selector: (T) -> Int): Double =
-        sumOf(selector) / size.toDouble()
-
-    fun EventStore.queryAsSequence(query: String) =
-        this.queryAsStream(query).asSequence()
 }
+
+inline fun <T> Collection<T>.averageBy(selector: (T) -> Int): Double =
+    sumOf(selector) / size.toDouble()
+
+fun EventStore.queryAsSequence(query: String) =
+    this.queryAsStream(query).asSequence()
