@@ -1,6 +1,6 @@
 package travelator.analytics
 
-import java.util.stream.Collectors
+import java.util.stream.Collectors.groupingBy
 
 class MarketingAnalytics(
     private val eventStore: EventStore
@@ -17,14 +17,12 @@ class MarketingAnalytics(
                 }
         val bookingEventsByInteractionId =
             eventsForSuccessfulBookings.collect(
-                Collectors.groupingBy { event -> event["interactionId"] as String }
+                groupingBy { event -> event["interactionId"] as String }
             )
-        val averageNumberOfEventsPerCompletedBooking =
-            bookingEventsByInteractionId
-                .values
-                .stream()
-                .mapToInt { it.size }
-                .average()
-        return averageNumberOfEventsPerCompletedBooking.orElse(Double.NaN)
+
+        return bookingEventsByInteractionId.values.averageBy { it.size }
     }
+
+    inline fun <T> Collection<T>.averageBy(selector: (T) -> Int): Double =
+        sumOf(selector) / size.toDouble()
 }
