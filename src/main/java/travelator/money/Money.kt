@@ -61,3 +61,5 @@ private constructor(// <2>
         }
     }
 }
+
+fun Iterable<Money>.sumOrNull() = reduceOrNull(Money::add)
