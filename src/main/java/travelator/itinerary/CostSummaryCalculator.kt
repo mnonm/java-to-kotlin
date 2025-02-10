@@ -1,45 +1,33 @@
-package travelator.itinerary;
+package travelator.itinerary
 
-import travelator.money.ExchangeRates;
-import travelator.money.Money;
+import travelator.money.ExchangeRates
+import travelator.money.Money
+import java.util.*
+import java.util.Comparator.comparing
 
-import java.util.ArrayList;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Map;
+class CostSummaryCalculator(
+    private val userCurrency: Currency,
+    private val exchangeRates: ExchangeRates
+) {
+    private val currencyTotals = mutableMapOf<Currency, Money>()
 
-import static java.util.Comparator.comparing;
-
-public class CostSummaryCalculator {
-    private final Currency userCurrency;
-    private final ExchangeRates exchangeRates;
-    private final Map<Currency, Money> currencyTotals = new HashMap<>();
-
-    public CostSummaryCalculator(
-        Currency userCurrency,
-        ExchangeRates exchangeRates
-    ) {
-        this.userCurrency = userCurrency;
-        this.exchangeRates = exchangeRates;
+    fun addCost(cost: Money) {
+        currencyTotals.merge(cost.currency, cost, Money::add)
     }
 
-    public void addCost(Money cost) {
-        currencyTotals.merge(cost.getCurrency(), cost, Money::add);
-    }
+    fun summarise(): CostSummary {
+        val totals = ArrayList(currencyTotals.values)
+        totals.sortWith(comparing { m: Money -> m.currency.currencyCode })
 
-    public CostSummary summarise() {
-        var totals = new ArrayList<>(currencyTotals.values());
-        totals.sort(comparing(m -> m.getCurrency().getCurrencyCode()));
-
-        CostSummary summary = new CostSummary(userCurrency);
-        for (var total : totals) {
-            summary.addLine(exchangeRates.convert(total, userCurrency));
+        val summary = CostSummary(userCurrency)
+        for (total in totals) {
+            summary.addLine(exchangeRates.convert(total, userCurrency))
         }
 
-        return summary;
+        return summary
     }
 
-    public void reset() {
-        currencyTotals.clear();
+    fun reset() {
+        currencyTotals.clear()
     }
 }
