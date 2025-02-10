@@ -45,15 +45,17 @@ private constructor(// <2>
                 currency
             )
 
-
+        @JvmStatic
         fun of(amountStr: String, currency: Currency): Money { // <2>
             return of(BigDecimal(amountStr), currency)
         }
 
+        @JvmStatic
         fun of(amount: Int, currency: Currency): Money {
             return of(BigDecimal(amount), currency)
         }
 
+        @JvmStatic
         fun zero(userCurrency: Currency): Money {
             return of(BigDecimal.ZERO, userCurrency)
         }
