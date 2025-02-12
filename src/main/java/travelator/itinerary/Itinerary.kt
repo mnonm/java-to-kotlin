@@ -3,12 +3,13 @@ package travelator.itinerary
 import travelator.Id
 import java.time.Duration
 
-class Itinerary(
+data class Itinerary(
     val id: Id<Itinerary>,
     val route: Route
-) {
-
-    fun hasJourneyLongerThan(duration: Duration) =
-        route.any { it.duration > duration }
-
+) : Route by route {
+    fun withTransformedRoute(transform: (Route).() -> Route) =
+        copy(route = transform(route))
 }
+
+fun Route.hasJourneyLongerThan(duration: Duration) =
+    any { it.duration > duration }
