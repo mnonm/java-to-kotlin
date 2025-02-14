@@ -6,9 +6,10 @@ import travelator.domain.DistanceCalculator
 import travelator.domain.Location
 
 class Recommendations(
-    private val featuredDestinations: FeaturedDestinations,
-    private val distanceCalculator: DistanceCalculator
+    private val destinationFinder: (Location) -> List<FeaturedDestination>,
+    private val distanceInMetersBetween: (Location, Location) -> Int
 ) {
+
     fun recommendationsFor(
         journey: Set<Location>
     ): List<FeaturedDestinationSuggestion> =
@@ -19,19 +20,18 @@ class Recommendations(
 
     fun recommendationsFor(
         location: Location
-    ): List<FeaturedDestinationSuggestion> {
-        return featuredDestinations.findCloseTo(location) // <1>
+    ): List<FeaturedDestinationSuggestion> =
+        destinationFinder(location) // <1>
             .map { featuredDestination: FeaturedDestination ->
                 FeaturedDestinationSuggestion(
                     location,
                     featuredDestination,
-                    distanceCalculator.distanceInMetersBetween( // <2>
+                    distanceInMetersBetween( // <2>
                         location,
                         featuredDestination.location
                     )
                 )
             }
-    }
 }
 
 private fun List<FeaturedDestinationSuggestion>.deduplicated() =
