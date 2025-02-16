@@ -1,8 +1,6 @@
 package travelator.recommendations
 
 import travelator.destinations.FeaturedDestination
-import travelator.destinations.FeaturedDestinations
-import travelator.domain.DistanceCalculator
 import travelator.domain.Location
 
 class Recommendations(
