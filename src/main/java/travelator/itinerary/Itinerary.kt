@@ -5,7 +5,8 @@ import java.time.Duration
 
 data class Itinerary(
     val id: Id<Itinerary>,
-    val route: Route
+    val route: Route,
+    val accommodations: List<Accommodation> = emptyList()
 ) : Route by route {
     fun withTransformedRoute(transform: (Route).() -> Route) =
         copy(route = transform(route))
