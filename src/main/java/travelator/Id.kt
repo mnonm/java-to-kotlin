@@ -1,42 +1,20 @@
-package travelator;
+package travelator
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*
 
-public class Id<T> {
-    private final String raw;
-
-    private Id(String raw) {
-        this.raw = raw;
+data class Id<out T> constructor(private val raw: String) {
+    override fun toString(): String {
+        return raw
     }
 
-    public static <T> Id<T> of(String raw) {
-        return new Id<T>(raw);
-    }
+    companion object {
+        @JvmStatic
+        fun <T> raw(id: Id<T>) = id.raw
 
-    public static <T> String raw(Id<T> id) {
-        return id.raw;
-    }
+        @JvmStatic
+        fun <T> derivedFrom(id: Id<*>) = Id<T>(id.raw)
 
-    public static <T> Id<T> mint() {
-        return Id.of(UUID.randomUUID().toString());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Id<?> id = (Id<?>) o;
-        return raw.equals(id.raw);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(raw);
-    }
-
-    @Override
-    public String toString() {
-        return raw;
+        @JvmStatic
+        fun <T> mint() = Id<T>(UUID.randomUUID().toString())
     }
 }

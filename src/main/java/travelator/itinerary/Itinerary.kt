@@ -1,16 +1,17 @@
 package travelator.itinerary
 
 import travelator.Id
-import java.time.Duration
+import travelator.geo.OverlayGroup
 
 data class Itinerary(
     val id: Id<Itinerary>,
-    val route: Route,
-    val accommodations: List<Accommodation> = emptyList()
-) : Route by route {
-    fun withTransformedRoute(transform: (Route).() -> Route) =
-        copy(route = transform(route))
-}
+    val items: List<ItineraryItem>
+) : Iterable<ItineraryItem> by items
 
-fun Route.hasJourneyLongerThan(duration: Duration) =
-    any { it.duration > duration }
+val Itinerary.mapOverlay
+    get() = OverlayGroup(
+        id = id,
+        elements = items.map { it.mapOverlay })
+
+val Itinerary.costs
+    get() = flatMap(ItineraryItem::costs)

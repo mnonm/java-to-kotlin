@@ -1,11 +1,13 @@
-package travelator.itinerary;
+package travelator.itinerary
 
-public enum TravelMethod {
-    AIR,
+import java.util.*
+
+enum class TravelMethod {
     SEA,
     RAIL,
     BUS,
     CAR,
-    CARRIAGE,
     CAMEL;
+
+    val userReadableName: String get() = name.lowercase(Locale.getDefault())
 }
