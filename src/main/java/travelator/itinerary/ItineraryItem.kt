@@ -11,7 +11,6 @@ sealed class ItineraryItem {
     abstract val id: Id<ItineraryItem>
     abstract val description: String
     abstract val costs: List<Money>
-    abstract val mapOverlay: MapOverlay
 }
 
 data class Accommodation(
@@ -28,13 +27,6 @@ data class Accommodation(
         get() = "$nights nights at ${location.userReadableName}"
     override val costs
         get() = listOf(totalPrice)
-    override val mapOverlay
-        get() = PointOverlay(
-            id = id,
-            position = location.position,
-            text = location.userReadableName,
-            icon = StandardIcons.HOTEL
-        )
 
 }
 
@@ -43,19 +35,13 @@ data class Attraction(
     val location: Location,
     val notes: String
 ) : ItineraryItem() {
-    override val description get() =
-        location.userReadableName
+    override val description
+        get() =
+            location.userReadableName
 
-    override val costs get() =
-        emptyList<Money>()
-
-    override val mapOverlay get() =
-        PointOverlay(
-            position = location.position,
-            text = description,
-            icon = StandardIcons.ATTRACTION,
-            id = id
-        )
+    override val costs
+        get() =
+            emptyList<Money>()
 
 }
 
@@ -77,20 +63,6 @@ data class Journey(
     override val costs
         get() = listOf(price)
 
-    override val mapOverlay
-        get() = OverlayGroup(
-            id = id,
-            elements = listOf(
-                PathOverlay(path, travelMethod.userReadableName),
-                PointOverlay(
-                    departsFrom.position,
-                    departsFrom.userReadableName,
-                    StandardIcons.START
-                ),
-                PointOverlay(arrivesAt.position, arrivesAt.userReadableName, StandardIcons.END)
-            )
-        )
-
 }
 
 data class RestaurantBooking(
@@ -102,12 +74,5 @@ data class RestaurantBooking(
 
     override val costs get() = emptyList<Money>()
 
-    override val mapOverlay get() =
-        PointOverlay(
-            id = id,
-            position = location.position,
-            text = location.userReadableName,
-            icon = StandardIcons.RESTAURANT
-        )
-
 }
+
