@@ -9,7 +9,6 @@ import java.time.ZonedDateTime
 
 sealed class ItineraryItem {
     abstract val id: Id<ItineraryItem>
-    abstract val costs: List<Money>
 }
 
 data class Accommodation(
@@ -21,22 +20,13 @@ data class Accommodation(
 ) : ItineraryItem() {
     val nights = Period.between(checkInFrom.toLocalDate(), checkOutBefore.toLocalDate()).days
     val totalPrice: Money = pricePerNight * nights
-
-    override val costs
-        get() = listOf(totalPrice)
-
 }
 
 data class Attraction(
     override val id: Id<Attraction>,
     val location: Location,
     val notes: String
-) : ItineraryItem() {
-    override val costs
-        get() =
-            emptyList<Money>()
-
-}
+) : ItineraryItem()
 
 data class Journey(
     override val id: Id<Journey>,
@@ -47,18 +37,11 @@ data class Journey(
     val arrivalTime: ZonedDateTime,
     val price: Money,
     val path: List<Position> = listOf(departsFrom.position, arrivesAt.position),
-) : ItineraryItem() {
-    override val costs
-        get() = listOf(price)
-
-}
+) : ItineraryItem()
 
 data class RestaurantBooking(
     override val id: Id<RestaurantBooking>,
     val location: Location,
     val time: ZonedDateTime
-) : ItineraryItem() {
-    override val costs get() = emptyList<Money>()
-
-}
+) : ItineraryItem()
 
