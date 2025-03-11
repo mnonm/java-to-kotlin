@@ -1,10 +1,19 @@
-package travelator;
+package travelator
 
-import java.util.Optional;
+import java.util.*
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
 
-public interface Customers {
+interface Customers {
+    @Throws(DuplicateException::class)
+    fun add(name: String, email: String): Customer
+    fun addToo(name: String, email: String): Result<Customer, DuplicateException> =
+        try {
+            Success(add(name, email));
+        } catch (x: DuplicateException) {
+            Failure(x);
+        }
 
-    Customer add(String name, String email) throws DuplicateException;
-
-    Optional<Customer> find(String id);
+    fun find(id: String): Optional<Customer>
 }
