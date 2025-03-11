@@ -1,26 +1,18 @@
-package travelator;
+package travelator
 
-import travelator.handlers.RegistrationData;
+import dev.forkhandles.result4k.orThrow
+import travelator.handlers.RegistrationData
 
-public class CustomerRegistration implements IRegisterCustomers {
+class CustomerRegistration(
+    private val customers: Customers,
+    private val exclusionList: ExclusionList
+) : IRegisterCustomers {
 
-    private final ExclusionList exclusionList;
-    private final Customers customers;
-
-    public CustomerRegistration(
-        Customers customers,
-        ExclusionList exclusionList
-    ) {
-        this.exclusionList = exclusionList;
-        this.customers = customers;
-    }
-
-    public Customer register(RegistrationData data)
-        throws ExcludedException, DuplicateException {
-        if (exclusionList.exclude(data)) {
-            throw new ExcludedException();
-        } else {
-            return customers.add(data.name, data.email);
+    @Throws(ExcludedException::class, DuplicateException::class)
+    override fun register(data: RegistrationData): Customer {
+        when {
+            exclusionList.exclude(data) -> throw ExcludedException()
+            else -> return customers.addToo(data.name, data.email).orThrow()
         }
     }
 }
