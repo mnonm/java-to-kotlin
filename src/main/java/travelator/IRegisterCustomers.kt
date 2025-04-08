@@ -1,8 +1,30 @@
-package travelator;
+package travelator
 
-import travelator.handlers.RegistrationData;
+import dev.forkhandles.result4k.Failure
+import dev.forkhandles.result4k.Result
+import dev.forkhandles.result4k.Success
+import travelator.handlers.RegistrationData
 
-public interface IRegisterCustomers {
-    Customer register(RegistrationData data)
-        throws ExcludedException, DuplicateException;
+
+interface IRegisterCustomers {
+    @Throws(ExcludedException::class, DuplicateException::class)
+    fun register(data: RegistrationData): Customer
+
+    fun registerToo(data: RegistrationData):
+            Result<Customer, RegistrationProblem> =
+        try {
+            Success(register(data))
+        } catch (x: ExcludedException) {
+            Failure(Excluded)
+        } catch (x: DuplicateException) {
+            Failure(Duplicate(x.message))
+        }
 }
+
+sealed class RegistrationProblem
+
+object Excluded : RegistrationProblem()
+
+data class Duplicate(
+    val message: String?
+) : RegistrationProblem()
