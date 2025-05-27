@@ -6,7 +6,10 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Test;
 
+import dev.forkhandles.result4k.Failure;
+import dev.forkhandles.result4k.Success;
 import travelator.Customer;
+import travelator.Duplicate;
 import travelator.DuplicateException;
 import travelator.ExcludedException;
 import travelator.IRegisterCustomers;
@@ -29,10 +32,10 @@ public class CustomerRegistrationHandlerTests {
 	@Test
 	public void returns_Created_with_body_on_success()
 		throws DuplicateException, ExcludedException {
-		when(registration.register(fredData))
-			.thenReturn(
+		when(registration.registerToo(fredData))
+			.thenReturn(new Success<>(
 				new Customer("0", fredData.name, fredData.email)
-			);
+			));
 
 		String expectedBody = toJson(
 			"{'id':'0','name':'fred','email':'fred@bedrock.com'}"
@@ -47,10 +50,10 @@ public class CustomerRegistrationHandlerTests {
 	public void returns_Conflict_for_duplicate()
 		throws DuplicateException, ExcludedException {
 
-		when(registration.register(fredData))
-			.thenThrow(
-				new DuplicateException("deliberate")
-			);
+		when(registration.registerToo(fredData))
+			.thenReturn(new Failure<>(
+				new Duplicate("deliberate")
+			));
 
 		assertEquals(
 			new Response(HTTP_CONFLICT),
