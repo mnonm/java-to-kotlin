@@ -11,6 +11,7 @@ import dev.forkhandles.result4k.Success;
 import travelator.Customer;
 import travelator.Duplicate;
 import travelator.DuplicateException;
+import travelator.Excluded;
 import travelator.ExcludedException;
 import travelator.IRegisterCustomers;
 import travelator.http.Request;
@@ -62,13 +63,12 @@ public class CustomerRegistrationHandlerTests {
 	}
 
 	@Test
-	public void returns_Forbidden_for_excluded()
-		throws DuplicateException, ExcludedException {
+	public void returns_Forbidden_for_excluded() {
 
-		when(registration.register(fredData))
-			.thenThrow(
-				new ExcludedException()
-			);
+		when(registration.registerToo(fredData))
+			.thenReturn(new Failure<>(
+				Excluded.INSTANCE
+			));
 
 		assertEquals(
 			new Response(HTTP_FORBIDDEN),
@@ -85,10 +85,9 @@ public class CustomerRegistrationHandlerTests {
 	}
 
 	@Test
-	public void returns_InternalError_for_other_exceptions()
-		throws DuplicateException, ExcludedException {
+	public void returns_InternalError_for_other_exceptions() {
 
-		when(registration.register(fredData))
+		when(registration.registerToo(fredData))
 			.thenThrow(
 				new RuntimeException("deliberate")
 			);
