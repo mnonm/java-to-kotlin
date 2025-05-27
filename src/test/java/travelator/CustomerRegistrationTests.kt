@@ -1,6 +1,8 @@
 package travelator
 
-import org.junit.jupiter.api.Assertions
+import dev.forkhandles.result4k.failureOrNull
+import dev.forkhandles.result4k.valueOrNull
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import travelator.handlers.RegistrationData
 import java.util.*
@@ -16,43 +18,42 @@ class CustomerRegistrationTests {
 
     @Test
     @Throws(DuplicateException::class, ExcludedException::class)
-    fun adds_a_customer_when_not_excluded() {
-        Assertions.assertEquals(Optional.empty<Any>(), customers.find("0"))
+    fun `adds a customer when not excluded`() {
+        assertEquals(Optional.empty<Any>(), customers.find("0"))
 
         val added = registration.register(
             RegistrationData("fred flintstone", "fred@bedrock.com")
-        )
-        Assertions.assertEquals(
+        ).valueOrNull()
+        assertEquals(
             Customer("0", "fred flintstone", "fred@bedrock.com"),
             added
         )
-        Assertions.assertEquals(added, customers.find("0").orElseThrow())
+        assertEquals(added, customers.find("0").orElseThrow())
     }
 
     @Test
-    fun throws_DuplicateException_when_email_address_exists() {
+    fun `returns Duplicate when email address exists`() {
         customers.add(Customer("0", "fred flintstone", "fred@bedrock.com"))
-        Assertions.assertEquals(1, customers.size())
-
-        Assertions.assertThrows(
-            DuplicateException::class.java
-        ) {
-            registration.register(
-                RegistrationData("another name", "fred@bedrock.com")
-            )
-        }
-        Assertions.assertEquals(1, customers.size())
+        assertEquals(1, customers.size())
+        val failure = registration.register(
+            RegistrationData("another name", "fred@bedrock.com")
+        ).failureOrNull()
+        assertEquals(
+            Duplicate("customer with email fred@bedrock.com already exists"),
+            failure
+        )
+        assertEquals(1, customers.size())
     }
 
     @Test
-    fun throws_ExcludedException_when_excluded() {
-        Assertions.assertThrows(
-            ExcludedException::class.java
-        ) {
-            registration.register(
-                RegistrationData("cruella de vil", "cruella@hellhall.co.uk")
-            )
-        }
-        Assertions.assertEquals(0, customers.size())
+    fun `returns Excluded when excluded`() {
+        val failure = registration.register(
+            RegistrationData("cruella de vil", "cruella@hellhall.co.uk")
+        ).failureOrNull()
+        assertEquals(
+            Excluded,
+            failure
+        )
+        assertEquals(0, customers.size())
     }
 }
