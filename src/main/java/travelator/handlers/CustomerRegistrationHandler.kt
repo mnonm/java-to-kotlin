@@ -7,7 +7,7 @@ import dev.forkhandles.result4k.recover
 import travelator.*
 import travelator.http.Request
 import travelator.http.Response
-import java.net.HttpURLConnection
+import java.net.HttpURLConnection.*
 
 class CustomerRegistrationHandler(
     private val registration: IRegisterCustomers
@@ -24,23 +24,24 @@ class CustomerRegistrationHandler(
             registration.register(data)
                 .map { value ->
                     Response(
-                        HttpURLConnection.HTTP_CREATED,
+                        HTTP_CREATED,
                         objectMapper.writeValueAsString(value)
                     )
                 }
                 .recover { reason -> reason.toResponse() }
         } catch (x: JsonProcessingException) {
-            Response(HttpURLConnection.HTTP_BAD_REQUEST)
+            Response(HTTP_BAD_REQUEST)
         } catch (x: ExcludedException) {
-            Response(HttpURLConnection.HTTP_FORBIDDEN)
+            Response(HTTP_FORBIDDEN)
         } catch (x: DuplicateException) {
-            Response(HttpURLConnection.HTTP_CONFLICT)
+            Response(HTTP_CONFLICT)
         } catch (x: Exception) {
-            Response(HttpURLConnection.HTTP_INTERNAL_ERROR)
+            Response(HTTP_INTERNAL_ERROR)
         }
 }
 
 private fun RegistrationProblem.toResponse() = when (this) {
-    is Duplicate -> Response(HttpURLConnection.HTTP_CONFLICT)
-    is Excluded -> Response(HttpURLConnection.HTTP_FORBIDDEN)
+    is Duplicate -> Response(HTTP_CONFLICT)
+    is Excluded -> Response(HTTP_FORBIDDEN)
+    is DatabaseProblem -> Response(HTTP_INTERNAL_ERROR)
 }
