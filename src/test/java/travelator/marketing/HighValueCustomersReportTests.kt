@@ -1,15 +1,12 @@
 package travelator.marketing
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.io.IOException
 import java.io.StringReader
 import java.io.StringWriter
 
 internal class HighValueCustomersReportTests {
     @Test
-    @Throws(IOException::class)
     fun test() {
         val input = listOf(
             "ID\tFirstName\tLastName\tScore\tSpend",
@@ -28,7 +25,6 @@ internal class HighValueCustomersReportTests {
     }
 
     @Test
-    @Throws(IOException::class)
     fun emptyTest() {
         val input = listOf(
             "ID\tFirstName\tLastName\tScore\tSpend"
@@ -48,16 +44,15 @@ internal class HighValueCustomersReportTests {
         )
     }
 
-    @Throws(IOException::class)
     private fun check(
         inputLines: List<String>,
         expectedLines: List<String>
     ) {
         val output = StringWriter()
-        generate(
-            StringReader(inputLines.joinToString("\n")),
-            output
-        )
-        assertEquals(expectedLines.joinToString("\n"), output.toString())
+        val reader = StringReader(inputLines.joinToString("\n"))
+        generate(reader, output)
+        val outputLines = output.toString().lines()
+
+        assertEquals(expectedLines, outputLines)
     }
 }
