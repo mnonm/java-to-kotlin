@@ -10,10 +10,10 @@ class InMemoryCustomers : Customers {
     private val list: MutableList<Customer> = ArrayList()
     private var id = 0
 
-    override fun add(name: String, email: String): Result<Customer, DuplicateException> {
+    override fun add(name: String, email: String): Result<Customer, CustomersProblem> {
         return when {
             list.any { it.email == email } -> Failure(
-                DuplicateException(
+                DuplicateCustomerProblem(
                     "customer with email $email already exists"
                 )
             )
