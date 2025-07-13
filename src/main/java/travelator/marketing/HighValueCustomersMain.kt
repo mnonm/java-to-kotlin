@@ -1,15 +1,21 @@
 package travelator.marketing
 
-object HighValueCustomersMain {
-    fun main(args: Array<String>) {
-        System.`in`.reader().use { reader ->
-            System.out.writer().use { writer ->
-                writer.append(
-                    generate(
-                        reader.readLines()
-                    ).joinToString("\n")
-                )
-            }
+import java.io.Writer
+
+fun main() {
+    System.`in`.reader().use { reader ->
+        System.out.writer().use { writer ->
+            writer.appendLines(
+                generate(reader.readLines())
+            )
+        }
+    }
+}
+
+fun Writer.appendLines(lines: Sequence<CharSequence>): Writer {
+    return this.also {
+        lines.forEach {
+            lines.forEach(this::appendLine)
         }
     }
 }
