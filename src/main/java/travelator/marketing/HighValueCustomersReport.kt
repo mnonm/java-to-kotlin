@@ -2,19 +2,20 @@ package travelator.marketing
 
 import java.util.*
 
-fun generate(lines: List<String>): Sequence<String> {
-    val valuableCustomers = lines
+fun Sequence<String>.toHighValueCustomerReport(): Sequence<String> {
+    val valuableCustomers = this
         .withoutHeader()
         .map { line -> line.toCustomerData() }
         .filter { it.score >= 10 }
         .sortedBy(CustomerData::score)
+        .toList()
 
     return sequenceOf("ID\tName\tSpend") +
             valuableCustomers.map(CustomerData::outputLine) +
             valuableCustomers.summarised()
 }
 
-private fun List<String>.withoutHeader() = drop(1)
+private fun Sequence<String>.withoutHeader() = drop(1)
 private fun List<CustomerData>.summarised(): String =
     sumOf { it.spend }.let { total ->
         "\tTOTAL\t${total.toMoneyString()}"
