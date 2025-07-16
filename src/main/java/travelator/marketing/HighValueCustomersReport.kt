@@ -2,10 +2,18 @@ package travelator.marketing
 
 import java.util.*
 
-fun Sequence<String>.toHighValueCustomerReport(): Sequence<String> {
+fun Sequence<String>.toHighValueCustomerReport(
+    onErrorLine: (String) -> Unit = {}
+): Sequence<String> {
     val valuableCustomers = this
         .withoutHeader()
-        .map { line -> line.toCustomerData() }
+        .map { line ->
+            val customerData = line.toCustomerData()
+            if (customerData == null)
+                onErrorLine(line)
+            customerData
+        }
+        .filterNotNull()
         .filter { it.score >= 10 }
         .sortedBy(CustomerData::score)
         .toList()
@@ -21,14 +29,21 @@ private fun List<CustomerData>.summarised(): String =
         "\tTOTAL\t${total.toMoneyString()}"
     }
 
-internal fun String.toCustomerData(): CustomerData =
-    split("\t".toRegex()).dropLastWhile { it.isEmpty() }.let { parts ->
+internal fun String.toCustomerData(): CustomerData? =
+    split("\t").let { parts ->
+        if (parts.size < 4)
+            return null
+        val score = parts[3].toIntOrNull() ?:
+            return null
+        val spend = if (parts.size == 4) 0.0 else parts[4].toDoubleOrNull() ?:
+            return null
+
         CustomerData(
             id = parts[0],
             givenName = parts[1],
             familyName = parts[2],
-            score = parts[3].toInt(),
-            spend = if (parts.size == 4) 0.0 else parts[4].toDouble()
+            score = score,
+            spend = spend
         )
     }
 
