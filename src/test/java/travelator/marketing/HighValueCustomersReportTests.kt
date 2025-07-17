@@ -51,7 +51,7 @@ internal class HighValueCustomersReportTests {
             "1\tFred\tFlintstone\t11\t1000.00",
         )
 
-        val errorCollector = mutableListOf<String>()
+        val errorCollector = mutableListOf<ParseFailure>()
         val result = lines
             .asSequence()
             .constrainOnce()
@@ -61,16 +61,16 @@ internal class HighValueCustomersReportTests {
             .toList()
 
         assertEquals(
+            listOf(NotEnoughFieldsFailure("INVALID LINE")),
+            errorCollector
+        )
+        assertEquals(
             listOf(
                 "ID\tName\tSpend",
                 "1\tFLINTSTONE, Fred\t1000.00",
                 "\tTOTAL\t1000.00"
             ),
             result
-        )
-        assertEquals(
-            listOf("INVALID LINE"),
-            errorCollector
         )
     }
 
