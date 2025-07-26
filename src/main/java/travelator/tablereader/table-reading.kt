@@ -2,15 +2,15 @@ package travelator.tablereader
 
 fun readTableWithHeader(
     lines: Sequence<String>,
-    splitter: (String) -> List<String>
-) = when {
-    lines.firstOrNull() == null -> emptySequence()
-    else -> readTable(
-        lines.drop(1),
-        headerProviderFrom(lines.first(), splitter),
-        splitter
-    )
-}
+    splitter: (String) -> List<String> = splitOnComma
+): Sequence<Map<String, String>> =
+    lines.destruct()?.let { (first, rest) ->
+        readTable(
+            rest,
+            headerProviderFrom(first, splitter),
+            splitter
+        )
+    } ?: emptySequence()
 
 fun headerProviderFrom(
     header: String,
@@ -50,3 +50,14 @@ private fun parseLine(
 }
 
 private fun String.splitFields(separators: String) = if (isEmpty()) emptyList() else split(separators)
+
+fun <T> Sequence<T>.destruct()
+        : Pair<T, Sequence<T>>? {
+    val iterator = iterator()
+    return when {
+        iterator.hasNext() ->
+            iterator.next() to iterator.asSequence()
+
+        else -> null
+    }
+}
