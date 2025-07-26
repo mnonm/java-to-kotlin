@@ -13,10 +13,10 @@ class TableReaderAcceptanceTests {
     @Test
     fun `acceptance test`() {
         val input = listOf(
-            "time, x, y",
-            "0.0, 1, 1",
-            "0.1, 1.1, 1.2",
-            "0.2", "1.2, 1.4",
+            "time,x,y",
+            "0.0,1,1",
+            "0.1,1.1,1.2",
+            "0.2,1.2,1.4",
         )
         val expected = listOf(
             Measurement(0.0, 1.0, 1.0),
@@ -25,7 +25,7 @@ class TableReaderAcceptanceTests {
         )
         assertEquals(
             expected,
-            readTable(input)
+            readTableWithHeader(input)
                 .map { record ->
                     Measurement(
                         record["time"]?.toDoubleOrNull() ?: error("in time"),
