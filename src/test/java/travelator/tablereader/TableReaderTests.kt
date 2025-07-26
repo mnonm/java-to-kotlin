@@ -98,4 +98,23 @@ class TableReaderTests {
             )
         )
     }
+
+    @Test
+    fun `can specify splitter`() {
+        assertEquals(
+            listOf(
+                mapOf(
+                    "header1" to "field0",
+                    "header2" to "field1"
+                )
+            ),
+            readTableWithHeader(
+                listOf(
+                    "header1\theader2",
+                    "field0\tfield1"
+                ),
+                splitOnTab
+            )
+        )
+    }
 }
