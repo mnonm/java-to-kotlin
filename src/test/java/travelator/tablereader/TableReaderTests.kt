@@ -7,11 +7,9 @@ class TableReaderTests {
 
     @Test
     fun `empty list returns empty list`() {
-        val input : List<String> = emptyList()
-        val expectedResult: List<Map<String, String>> = emptyList()
         assertEquals(
-            expectedResult,
-            readTable(input)
+            emptyList<Map<String, String>>(),
+            readTable(emptyList())
         )
     }
 
@@ -118,3 +116,23 @@ class TableReaderTests {
         )
     }
 }
+
+fun readTableWithHeader(
+    lines: List<String>,
+    splitter: (String) -> List<String> = splitOnComma
+): List<Map<String, String>> =
+    readTableWithHeader(
+        lines.asSequence(),
+        splitter
+    ).toList()
+
+private fun readTable(
+    lines: List<String>,
+    headerProvider: (Int) -> String = Integer::toString,
+    splitter: (String) -> List<String> = splitOnComma
+): List<Map<String, String>> =
+    readTable(
+        lines.asSequence(),
+        headerProvider,
+        splitter
+    ).toList()

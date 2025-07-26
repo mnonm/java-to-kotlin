@@ -1,17 +1,16 @@
 package travelator.tablereader
 
 fun readTableWithHeader(
-    lines: List<String>,
-    splitter: (String) -> List<String> = splitOnComma
-): List<Map<String, String>> =
-    when {
-        lines.isEmpty() -> emptyList()
-        else -> readTable(
-            lines.drop(1),
-            headerProviderFrom(lines.first(), splitter),
-            splitter
-        )
-    }
+    lines: Sequence<String>,
+    splitter: (String) -> List<String>
+) = when {
+    lines.firstOrNull() == null -> emptySequence()
+    else -> readTable(
+        lines.drop(1),
+        headerProviderFrom(lines.first(), splitter),
+        splitter
+    )
+}
 
 fun headerProviderFrom(
     header: String,
@@ -22,13 +21,14 @@ fun headerProviderFrom(
 }
 
 fun readTable(
-    lines: List<String>,
+    lines: Sequence<String>,
     headerProvider: (Int) -> String = Int::toString,
     splitter: (String) -> List<String> = splitOnComma
-): List<Map<String, String>> =
+): Sequence<Map<String, String>> =
     lines.map {
         parseLine(it, headerProvider, splitter)
     }
+
 
 fun splitOn(
     separators: String
@@ -49,4 +49,4 @@ private fun parseLine(
     return keys.zip(values).toMap()
 }
 
-private fun String.splitFields(separators: String) = if (separators.isEmpty()) emptyList() else split(separators)
+private fun String.splitFields(separators: String) = if (isEmpty()) emptyList() else split(separators)

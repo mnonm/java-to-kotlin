@@ -36,8 +36,4 @@ class TableReaderAcceptanceTests {
         )
 
     }
-
-    private fun readTable(input: List<String>): List<Map<String, String>> {
-        TODO("Not yet implemented")
-    }
 }
