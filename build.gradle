@@ -15,6 +15,7 @@ dependencies {
     implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
     implementation(platform("dev.forkhandles:forkhandles-bom:2.22.1.0"))
     implementation("dev.forkhandles:result4k")
+    implementation "org.apache.commons:commons-csv:1.8"
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
